@@ -27,4 +27,11 @@
         android:text="Permission not yet requested"
         android:textSize="16sp" />
 
+    <Button
+        android:id="@+id/btnFlashlight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Toggle Flashlight" />
+
 </LinearLayout>
