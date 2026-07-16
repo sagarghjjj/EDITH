@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var callController: CallController
     private lateinit var smsController: SmsController
     private lateinit var cameraController: CameraController
+    private lateinit var speechOutput: SpeechOutput
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         callController = CallController(this)
         smsController = SmsController()
         cameraController = CameraController(this, this)
+        speechOutput = SpeechOutput(this)
 
         val statusText = findViewById<TextView>(R.id.tvPermissionStatus)
         val testButton = findViewById<Button>(R.id.btnTestPermission)
@@ -49,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         val previewView = findViewById<PreviewView>(R.id.previewView)
         val takePhotoButton = findViewById<Button>(R.id.btnTakePhoto)
         val cameraStatus = findViewById<TextView>(R.id.tvCameraStatus)
+        val testVoiceButton = findViewById<Button>(R.id.btnTestVoice)
 
         testButton.setOnClickListener {
             permissionManager.requestPermission(Manifest.permission.CAMERA) { granted ->
@@ -155,10 +158,19 @@ class MainActivity : AppCompatActivity() {
                 cameraStatus.text = message
             }
         }
+
+        testVoiceButton.setOnClickListener {
+            speechOutput.speak("Hello. EDITH voice output is working.")
+        }
     }
 
     override fun onStop() {
         super.onStop()
         flashlightController.turnOff()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        speechOutput.shutdown()
     }
 }
