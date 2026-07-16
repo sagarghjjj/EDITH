@@ -60,5 +60,20 @@
         android:text="Bluetooth status unknown"
         android:textSize="16sp" />
 
+    <Button
+        android:id="@+id/btnBatteryInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Check Battery Info" />
+
+    <TextView
+        android:id="@+id/tvBatteryStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Battery info not yet checked"
+        android:textSize="16sp" />
+
 </LinearLayout>
 </ScrollView>
