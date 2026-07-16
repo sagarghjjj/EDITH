@@ -3,6 +3,7 @@ package com.edith.app
 import android.Manifest
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
@@ -12,6 +13,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var flashlightController: FlashlightController
     private lateinit var bluetoothController: BluetoothController
     private lateinit var batteryInfoProvider: BatteryInfoProvider
+    private lateinit var callController: CallController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +23,7 @@ class MainActivity : AppCompatActivity() {
         flashlightController = FlashlightController(this)
         bluetoothController = BluetoothController(this)
         batteryInfoProvider = BatteryInfoProvider(this)
+        callController = CallController(this)
 
         val statusText = findViewById<TextView>(R.id.tvPermissionStatus)
         val testButton = findViewById<Button>(R.id.btnTestPermission)
@@ -30,6 +33,9 @@ class MainActivity : AppCompatActivity() {
         val bluetoothStatus = findViewById<TextView>(R.id.tvBluetoothStatus)
         val batteryButton = findViewById<Button>(R.id.btnBatteryInfo)
         val batteryStatus = findViewById<TextView>(R.id.tvBatteryStatus)
+        val phoneNumberInput = findViewById<EditText>(R.id.etPhoneNumber)
+        val callButton = findViewById<Button>(R.id.btnCall)
+        val callStatus = findViewById<TextView>(R.id.tvCallStatus)
 
         testButton.setOnClickListener {
             permissionManager.requestPermission(Manifest.permission.CAMERA) { granted ->
@@ -75,6 +81,26 @@ class MainActivity : AppCompatActivity() {
             batteryStatus.text = "Battery: ${info.percentage}% | " +
                 "Charging: ${if (info.isCharging) "Yes" else "No"} | " +
                 "Temp: ${info.temperatureCelsius}°C"
+        }
+
+        callButton.setOnClickListener {
+            val number = phoneNumberInput.text.toString().trim()
+            if (number.isEmpty()) {
+                callStatus.text = "Enter a phone number first"
+                return@setOnClickListener
+            }
+            permissionManager.requestPermission(Manifest.permission.CALL_PHONE) { granted ->
+                if (granted) {
+                    val success = callController.placeCall(number)
+                    callStatus.text = if (success) {
+                        "Calling $number..."
+                    } else {
+                        "Failed to place call"
+                    }
+                } else {
+                    callStatus.text = "Call permission denied"
+                }
+            }
         }
     }
 
