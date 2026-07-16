@@ -18,6 +18,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var smsController: SmsController
     private lateinit var cameraController: CameraController
     private lateinit var speechOutput: SpeechOutput
+    private lateinit var speechInput: SpeechInput
+    private lateinit var commandProcessor: CommandProcessor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +33,8 @@ class MainActivity : AppCompatActivity() {
         smsController = SmsController()
         cameraController = CameraController(this, this)
         speechOutput = SpeechOutput(this)
+        speechInput = SpeechInput(this)
+        commandProcessor = CommandProcessor(flashlightController, speechOutput)
 
         val statusText = findViewById<TextView>(R.id.tvPermissionStatus)
         val testButton = findViewById<Button>(R.id.btnTestPermission)
@@ -52,6 +56,8 @@ class MainActivity : AppCompatActivity() {
         val takePhotoButton = findViewById<Button>(R.id.btnTakePhoto)
         val cameraStatus = findViewById<TextView>(R.id.tvCameraStatus)
         val testVoiceButton = findViewById<Button>(R.id.btnTestVoice)
+        val listenButton = findViewById<Button>(R.id.btnListen)
+        val heardText = findViewById<TextView>(R.id.tvHeardText)
 
         testButton.setOnClickListener {
             permissionManager.requestPermission(Manifest.permission.CAMERA) { granted ->
@@ -162,6 +168,25 @@ class MainActivity : AppCompatActivity() {
         testVoiceButton.setOnClickListener {
             speechOutput.speak("Hello. EDITH voice output is working.")
         }
+
+        listenButton.setOnClickListener {
+            permissionManager.requestPermission(Manifest.permission.RECORD_AUDIO) { granted ->
+                if (granted) {
+                    heardText.text = "Listening..."
+                    speechInput.startListening(
+                        onResult = { text ->
+                            heardText.text = "Heard: \"$text\""
+                            commandProcessor.process(text)
+                        },
+                        onError = { error ->
+                            heardText.text = error
+                        }
+                    )
+                } else {
+                    heardText.text = "Microphone permission denied"
+                }
+            }
+        }
     }
 
     override fun onStop() {
@@ -172,5 +197,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         speechOutput.shutdown()
+        speechInput.destroy()
     }
 }

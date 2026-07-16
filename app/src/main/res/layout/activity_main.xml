@@ -164,5 +164,20 @@
         android:layout_marginTop="32dp"
         android:text="Test Voice (Say Hello)" />
 
+    <Button
+        android:id="@+id/btnListen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Listen (Say a Command)" />
+
+    <TextView
+        android:id="@+id/tvHeardText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Nothing heard yet"
+        android:textSize="16sp" />
+
 </LinearLayout>
 </ScrollView>
