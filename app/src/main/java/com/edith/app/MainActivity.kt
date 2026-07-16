@@ -14,6 +14,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bluetoothController: BluetoothController
     private lateinit var batteryInfoProvider: BatteryInfoProvider
     private lateinit var callController: CallController
+    private lateinit var smsController: SmsController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +25,7 @@ class MainActivity : AppCompatActivity() {
         bluetoothController = BluetoothController(this)
         batteryInfoProvider = BatteryInfoProvider(this)
         callController = CallController(this)
+        smsController = SmsController()
 
         val statusText = findViewById<TextView>(R.id.tvPermissionStatus)
         val testButton = findViewById<Button>(R.id.btnTestPermission)
@@ -36,6 +38,10 @@ class MainActivity : AppCompatActivity() {
         val phoneNumberInput = findViewById<EditText>(R.id.etPhoneNumber)
         val callButton = findViewById<Button>(R.id.btnCall)
         val callStatus = findViewById<TextView>(R.id.tvCallStatus)
+        val smsNumberInput = findViewById<EditText>(R.id.etSmsNumber)
+        val smsMessageInput = findViewById<EditText>(R.id.etSmsMessage)
+        val sendSmsButton = findViewById<Button>(R.id.btnSendSms)
+        val smsStatus = findViewById<TextView>(R.id.tvSmsStatus)
 
         testButton.setOnClickListener {
             permissionManager.requestPermission(Manifest.permission.CAMERA) { granted ->
@@ -99,6 +105,27 @@ class MainActivity : AppCompatActivity() {
                     }
                 } else {
                     callStatus.text = "Call permission denied"
+                }
+            }
+        }
+
+        sendSmsButton.setOnClickListener {
+            val number = smsNumberInput.text.toString().trim()
+            val message = smsMessageInput.text.toString().trim()
+            if (number.isEmpty() || message.isEmpty()) {
+                smsStatus.text = "Enter both a number and a message"
+                return@setOnClickListener
+            }
+            permissionManager.requestPermission(Manifest.permission.SEND_SMS) { granted ->
+                if (granted) {
+                    val success = smsController.sendSms(number, message)
+                    smsStatus.text = if (success) {
+                        "SMS sent to $number"
+                    } else {
+                        "Failed to send SMS"
+                    }
+                } else {
+                    smsStatus.text = "SMS permission denied"
                 }
             }
         }

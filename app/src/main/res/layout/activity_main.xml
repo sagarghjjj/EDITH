@@ -98,5 +98,36 @@
         android:text="No call placed yet"
         android:textSize="16sp" />
 
+    <EditText
+        android:id="@+id/etSmsNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:hint="Enter phone number for SMS"
+        android:inputType="phone" />
+
+    <EditText
+        android:id="@+id/etSmsMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Enter message"
+        android:inputType="textMultiLine" />
+
+    <Button
+        android:id="@+id/btnSendSms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Send SMS" />
+
+    <TextView
+        android:id="@+id/tvSmsStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="No SMS sent yet"
+        android:textSize="16sp" />
+
 </LinearLayout>
 </ScrollView>
