@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.view.PreviewView
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var batteryInfoProvider: BatteryInfoProvider
     private lateinit var callController: CallController
     private lateinit var smsController: SmsController
+    private lateinit var cameraController: CameraController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         batteryInfoProvider = BatteryInfoProvider(this)
         callController = CallController(this)
         smsController = SmsController()
+        cameraController = CameraController(this, this)
 
         val statusText = findViewById<TextView>(R.id.tvPermissionStatus)
         val testButton = findViewById<Button>(R.id.btnTestPermission)
@@ -42,6 +45,10 @@ class MainActivity : AppCompatActivity() {
         val smsMessageInput = findViewById<EditText>(R.id.etSmsMessage)
         val sendSmsButton = findViewById<Button>(R.id.btnSendSms)
         val smsStatus = findViewById<TextView>(R.id.tvSmsStatus)
+        val startCameraButton = findViewById<Button>(R.id.btnStartCamera)
+        val previewView = findViewById<PreviewView>(R.id.previewView)
+        val takePhotoButton = findViewById<Button>(R.id.btnTakePhoto)
+        val cameraStatus = findViewById<TextView>(R.id.tvCameraStatus)
 
         testButton.setOnClickListener {
             permissionManager.requestPermission(Manifest.permission.CAMERA) { granted ->
@@ -127,6 +134,25 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     smsStatus.text = "SMS permission denied"
                 }
+            }
+        }
+
+        startCameraButton.setOnClickListener {
+            permissionManager.requestPermission(Manifest.permission.CAMERA) { granted ->
+                if (granted) {
+                    cameraController.startCamera(previewView) { error ->
+                        cameraStatus.text = error
+                    }
+                    cameraStatus.text = "Camera started"
+                } else {
+                    cameraStatus.text = "Camera permission denied"
+                }
+            }
+        }
+
+        takePhotoButton.setOnClickListener {
+            cameraController.takePhoto { success, message ->
+                cameraStatus.text = message
             }
         }
     }

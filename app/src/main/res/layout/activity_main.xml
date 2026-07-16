@@ -129,5 +129,33 @@
         android:text="No SMS sent yet"
         android:textSize="16sp" />
 
+    <Button
+        android:id="@+id/btnStartCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Start Camera" />
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btnTakePhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Take Photo" />
+
+    <TextView
+        android:id="@+id/tvCameraStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Camera not started"
+        android:textSize="16sp" />
+
 </LinearLayout>
 </ScrollView>
