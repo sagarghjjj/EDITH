@@ -9,14 +9,8 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.NotificationCompat
 
-/**
- * Foreground service that continuously listens for the wake phrase "hey edith".
- * Simplified version: not battery-optimized, restarts listening in a loop.
- * Improve later with proper always-on wake word detection (e.g. Porcupine/Vosk).
- */
 class WakeWordService : Service() {
 
     private lateinit var speechInput: SpeechInput
@@ -26,6 +20,7 @@ class WakeWordService : Service() {
     private val handler = Handler(Looper.getMainLooper())
 
     private var isRunning = false
+    private var attemptCount = 0
 
     companion object {
         const val CHANNEL_ID = "edith_wake_word_channel"
@@ -40,49 +35,52 @@ class WakeWordService : Service() {
         commandProcessor = CommandProcessor(flashlightController, speechOutput)
 
         createNotificationChannel()
-        startForeground(NOTIFICATION_ID, buildNotification("Listening for \"Hey Edith\"..."))
+        startForeground(NOTIFICATION_ID, buildNotification("Starting..."))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (!isRunning) {
             isRunning = true
-            listenForWakeWord()
+            handler.postDelayed({ listenForWakeWord() }, 800)
         }
         return START_STICKY
     }
 
     private fun listenForWakeWord() {
         if (!isRunning) return
+        attemptCount++
+        updateNotification("Listening... (attempt $attemptCount)")
 
         speechInput.startListening(
             onResult = { text ->
                 val lower = text.lowercase()
+                updateNotification("Heard: \"$text\"")
                 if (lower.contains("edith")) {
-                    updateNotification("Wake word heard! Listening for command...")
                     speechOutput.speak("Yes?")
-                    handler.postDelayed({ listenForCommand() }, 1200)
+                    handler.postDelayed({ listenForCommand() }, 1500)
                 } else {
-                    handler.postDelayed({ listenForWakeWord() }, 500)
+                    handler.postDelayed({ listenForWakeWord() }, 800)
                 }
             },
-            onError = {
-                handler.postDelayed({ listenForWakeWord() }, 1000)
+            onError = { error ->
+                updateNotification("Error: $error")
+                handler.postDelayed({ listenForWakeWord() }, 1500)
             }
         )
     }
 
     private fun listenForCommand() {
         if (!isRunning) return
+        updateNotification("Listening for command...")
 
         speechInput.startListening(
             onResult = { text ->
-                updateNotification("Listening for \"Hey Edith\"...")
                 commandProcessor.process(text)
                 handler.postDelayed({ listenForWakeWord() }, 1500)
             },
-            onError = {
-                updateNotification("Listening for \"Hey Edith\"...")
-                handler.postDelayed({ listenForWakeWord() }, 1000)
+            onError = { error ->
+                updateNotification("Command error: $error")
+                handler.postDelayed({ listenForWakeWord() }, 1500)
             }
         )
     }
