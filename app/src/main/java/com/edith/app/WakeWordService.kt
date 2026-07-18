@@ -55,7 +55,7 @@ class WakeWordService : Service() {
             onResult = { text ->
                 val lower = text.lowercase()
                 updateNotification("Heard: \"$text\"")
-                if (lower.contains("edith")) {
+                if ((lower.contains("edith") || lower.contains("edit") || lower.contains("eddie") || lower.contains("eaton"))) {
                     speechOutput.speak("Yes?")
                     handler.postDelayed({ listenForCommand() }, 1500)
                 } else {
