@@ -179,5 +179,19 @@
         android:text="Nothing heard yet"
         android:textSize="16sp" />
 
+    <Button
+        android:id="@+id/btnStartWakeWord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Start Always-On Listening" />
+
+    <Button
+        android:id="@+id/btnStopWakeWord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Stop Always-On Listening" />
+
 </LinearLayout>
 </ScrollView>

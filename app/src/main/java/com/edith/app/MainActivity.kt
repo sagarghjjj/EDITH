@@ -1,6 +1,8 @@
 package com.edith.app
 
 import android.Manifest
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -58,35 +60,25 @@ class MainActivity : AppCompatActivity() {
         val testVoiceButton = findViewById<Button>(R.id.btnTestVoice)
         val listenButton = findViewById<Button>(R.id.btnListen)
         val heardText = findViewById<TextView>(R.id.tvHeardText)
+        val startWakeWordButton = findViewById<Button>(R.id.btnStartWakeWord)
+        val stopWakeWordButton = findViewById<Button>(R.id.btnStopWakeWord)
 
         testButton.setOnClickListener {
             permissionManager.requestPermission(Manifest.permission.CAMERA) { granted ->
-                statusText.text = if (granted) {
-                    "Camera permission: GRANTED"
-                } else {
-                    "Camera permission: DENIED"
-                }
+                statusText.text = if (granted) "Camera permission: GRANTED" else "Camera permission: DENIED"
             }
         }
 
         flashlightButton.setOnClickListener {
             val isNowOn = flashlightController.toggle()
-            flashlightButton.text = if (isNowOn) {
-                "Turn Flashlight Off"
-            } else {
-                "Toggle Flashlight"
-            }
+            flashlightButton.text = if (isNowOn) "Turn Flashlight Off" else "Toggle Flashlight"
         }
 
         bluetoothEnableButton.setOnClickListener {
             permissionManager.requestPermission(Manifest.permission.BLUETOOTH_CONNECT) { granted ->
                 if (granted) {
                     bluetoothController.requestEnable { success ->
-                        bluetoothStatus.text = if (success) {
-                            "Bluetooth: ENABLED"
-                        } else {
-                            "Bluetooth: user declined or already on"
-                        }
+                        bluetoothStatus.text = if (success) "Bluetooth: ENABLED" else "Bluetooth: user declined or already on"
                     }
                 } else {
                     bluetoothStatus.text = "Bluetooth permission denied"
@@ -100,9 +92,7 @@ class MainActivity : AppCompatActivity() {
 
         batteryButton.setOnClickListener {
             val info = batteryInfoProvider.getBatteryInfo()
-            batteryStatus.text = "Battery: ${info.percentage}% | " +
-                "Charging: ${if (info.isCharging) "Yes" else "No"} | " +
-                "Temp: ${info.temperatureCelsius}°C"
+            batteryStatus.text = "Battery: ${info.percentage}% | Charging: ${if (info.isCharging) "Yes" else "No"} | Temp: ${info.temperatureCelsius}°C"
         }
 
         callButton.setOnClickListener {
@@ -114,11 +104,7 @@ class MainActivity : AppCompatActivity() {
             permissionManager.requestPermission(Manifest.permission.CALL_PHONE) { granted ->
                 if (granted) {
                     val success = callController.placeCall(number)
-                    callStatus.text = if (success) {
-                        "Calling $number..."
-                    } else {
-                        "Failed to place call"
-                    }
+                    callStatus.text = if (success) "Calling $number..." else "Failed to place call"
                 } else {
                     callStatus.text = "Call permission denied"
                 }
@@ -135,11 +121,7 @@ class MainActivity : AppCompatActivity() {
             permissionManager.requestPermission(Manifest.permission.SEND_SMS) { granted ->
                 if (granted) {
                     val success = smsController.sendSms(number, message)
-                    smsStatus.text = if (success) {
-                        "SMS sent to $number"
-                    } else {
-                        "Failed to send SMS"
-                    }
+                    smsStatus.text = if (success) "SMS sent to $number" else "Failed to send SMS"
                 } else {
                     smsStatus.text = "SMS permission denied"
                 }
@@ -149,9 +131,7 @@ class MainActivity : AppCompatActivity() {
         startCameraButton.setOnClickListener {
             permissionManager.requestPermission(Manifest.permission.CAMERA) { granted ->
                 if (granted) {
-                    cameraController.startCamera(previewView) { error ->
-                        cameraStatus.text = error
-                    }
+                    cameraController.startCamera(previewView) { error -> cameraStatus.text = error }
                     cameraStatus.text = "Camera started"
                 } else {
                     cameraStatus.text = "Camera permission denied"
@@ -160,9 +140,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         takePhotoButton.setOnClickListener {
-            cameraController.takePhoto { success, message ->
-                cameraStatus.text = message
-            }
+            cameraController.takePhoto { success, message -> cameraStatus.text = message }
         }
 
         testVoiceButton.setOnClickListener {
@@ -178,14 +156,34 @@ class MainActivity : AppCompatActivity() {
                             heardText.text = "Heard: \"$text\""
                             commandProcessor.process(text)
                         },
-                        onError = { error ->
-                            heardText.text = error
-                        }
+                        onError = { error -> heardText.text = error }
                     )
                 } else {
                     heardText.text = "Microphone permission denied"
                 }
             }
+        }
+
+        startWakeWordButton.setOnClickListener {
+            val neededPermissions = mutableListOf(Manifest.permission.RECORD_AUDIO)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                neededPermissions.add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+            permissionManager.requestPermissions(neededPermissions) { results ->
+                if (results.all { it.value }) {
+                    val serviceIntent = Intent(this, WakeWordService::class.java)
+                    startForegroundService(serviceIntent)
+                    heardText.text = "Always-on listening started. Say \"Hey Edith\"."
+                } else {
+                    heardText.text = "Permissions required for always-on listening"
+                }
+            }
+        }
+
+        stopWakeWordButton.setOnClickListener {
+            val serviceIntent = Intent(this, WakeWordService::class.java)
+            stopService(serviceIntent)
+            heardText.text = "Always-on listening stopped."
         }
     }
 
