@@ -43,7 +43,7 @@ class WakeWordService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (!isRunning) {
             isRunning = true
-            handler.postDelayed({ listenForWakeWord() }, 800)
+            handler.postDelayed({ listenForWakeWord() }, 300)
         }
         return START_STICKY
     }
@@ -59,14 +59,14 @@ class WakeWordService : Service() {
                 updateNotification("Heard: \"$text\"")
                 if ((lower.contains("edith") || lower.contains("edit") || lower.contains("eddie") || lower.contains("eaton"))) {
                     speechOutput.speak("Yes?")
-                    handler.postDelayed({ listenForCommand() }, 1500)
+                    handler.postDelayed({ listenForCommand() }, 600)
                 } else {
-                    handler.postDelayed({ listenForWakeWord() }, 800)
+                    handler.postDelayed({ listenForWakeWord() }, 300)
                 }
             },
             onError = { error ->
                 updateNotification("Error: $error")
-                handler.postDelayed({ listenForWakeWord() }, 1500)
+                handler.postDelayed({ listenForWakeWord() }, 600)
             }
         )
     }
@@ -78,11 +78,11 @@ class WakeWordService : Service() {
         speechInput.startListening(
             onResult = { text ->
                 commandProcessor.process(text)
-                handler.postDelayed({ listenForWakeWord() }, 1500)
+                handler.postDelayed({ listenForWakeWord() }, 600)
             },
             onError = { error ->
                 updateNotification("Command error: $error")
-                handler.postDelayed({ listenForWakeWord() }, 1500)
+                handler.postDelayed({ listenForWakeWord() }, 600)
             }
         )
     }
