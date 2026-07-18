@@ -1,6 +1,7 @@
 package com.edith.app
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.util.Log
 
@@ -28,8 +29,14 @@ class AppLauncher(private val context: Context) {
 
         val launchIntent = packageManager.getLaunchIntentForPackage(match.packageName)
         return if (launchIntent != null) {
-            context.startActivity(launchIntent)
-            true
+            launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            try {
+                context.startActivity(launchIntent)
+                true
+            } catch (e: Exception) {
+                Log.e("AppLauncher", "Failed to start activity", e)
+                false
+            }
         } else {
             Log.e("AppLauncher", "App found but has no launch intent: ${match.packageName}")
             false
