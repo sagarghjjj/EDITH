@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var speechOutput: SpeechOutput
     private lateinit var speechInput: SpeechInput
     private lateinit var commandProcessor: CommandProcessor
+    private lateinit var appLauncher: AppLauncher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +37,8 @@ class MainActivity : AppCompatActivity() {
         cameraController = CameraController(this, this)
         speechOutput = SpeechOutput(this)
         speechInput = SpeechInput(this)
-        commandProcessor = CommandProcessor(flashlightController, speechOutput)
+        appLauncher = AppLauncher(this)
+        commandProcessor = CommandProcessor(flashlightController, speechOutput, appLauncher)
 
         val statusText = findViewById<TextView>(R.id.tvPermissionStatus)
         val testButton = findViewById<Button>(R.id.btnTestPermission)

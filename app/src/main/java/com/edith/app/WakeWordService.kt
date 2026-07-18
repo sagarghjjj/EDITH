@@ -16,6 +16,7 @@ class WakeWordService : Service() {
     private lateinit var speechInput: SpeechInput
     private lateinit var speechOutput: SpeechOutput
     private lateinit var commandProcessor: CommandProcessor
+    private lateinit var appLauncher: AppLauncher
     private lateinit var flashlightController: FlashlightController
     private val handler = Handler(Looper.getMainLooper())
 
@@ -32,7 +33,8 @@ class WakeWordService : Service() {
         speechInput = SpeechInput(this)
         speechOutput = SpeechOutput(this)
         flashlightController = FlashlightController(this)
-        commandProcessor = CommandProcessor(flashlightController, speechOutput)
+        appLauncher = AppLauncher(this)
+        commandProcessor = CommandProcessor(flashlightController, speechOutput, appLauncher)
 
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, buildNotification("Starting..."))

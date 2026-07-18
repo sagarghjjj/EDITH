@@ -6,13 +6,27 @@ package com.edith.app
  */
 class CommandProcessor(
     private val flashlightController: FlashlightController,
-    private val speechOutput: SpeechOutput
+    private val speechOutput: SpeechOutput,
+    private val appLauncher: AppLauncher
 ) {
 
     fun process(text: String) {
         val lower = text.lowercase().trim()
 
         when {
+            lower.startsWith("open ") -> {
+                val appName = lower.removePrefix("open ").trim()
+                if (appName.isEmpty()) {
+                    speechOutput.speak("Which app should I open?")
+                    return
+                }
+                val success = appLauncher.launchApp(appName)
+                if (success) {
+                    speechOutput.speak("Opening $appName")
+                } else {
+                    speechOutput.speak("I couldn't find an app called $appName")
+                }
+            }
             lower.contains("turn on") && lower.contains("flashlight") -> {
                 if (!flashlightController.isOn) {
                     flashlightController.toggle()
